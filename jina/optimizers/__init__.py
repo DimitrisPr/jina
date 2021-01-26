@@ -9,7 +9,7 @@ from ..importer import ImportExtensions
 from ..logging import default_logger as logger
 from .parameters import load_optimization_parameters
 from ..jaml import JAMLCompatible
-from .parameters import IntegerParameter, FloatParameter, UniformParameter, LogUniformParameter, CategoricalParameter, DiscreteUniformParameter
+from .parameters import IntegerParameter, UniformParameter, LogUniformParameter, CategoricalParameter, DiscreteUniformParameter
 
 if False:
     from .flow_runner import FlowRunner
@@ -103,6 +103,8 @@ class ResultProcessor(JAMLCompatible):
 class FlowOptimizer(JAMLCompatible):
     """Optimizer runs the given flows on multiple parameter configurations in order
        to find the best performing parameters. Uses `optuna` behind the scenes.
+       For a detailed information how the parameters are sampled by optuna see
+       https://optuna.readthedocs.io/en/stable/reference/generated/optuna.trial.Trial.html
     """
 
     def __init__(
@@ -157,14 +159,6 @@ class FlowOptimizer(JAMLCompatible):
                 high=param.high,
                 step=param.step_size,
                 log=param.log
-            )
-        elif isinstance(param, FloatParameter):
-            return trial.suggest_float(
-                name=param.jaml_variable,
-                low=param.low,
-                high=param.high,
-                step=param.step_size,
-                log=param.log,
             )
         elif isinstance(param, UniformParameter):
             return trial.suggest_uniform(
